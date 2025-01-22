@@ -6,6 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.praktikum.api.UserApi;
+import ru.yandex.praktikum.data.CreateUser;
+import ru.yandex.praktikum.data.LoginUser;
 import ru.yandex.praktikum.data.UserData;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.Matchers.is;
@@ -14,16 +16,18 @@ public class CreateUserTest {
 
     private UserData newUser;
     private UserApi userApi;
+    private LoginUser login;
 
     @Before
     public void setUp() {
         userApi = new UserApi();
-        newUser = new UserData();
+        newUser = CreateUser.createRandomUser();
+        login = new LoginUser(newUser.getEmail(), newUser.getPassword());
     }
 
     @After
     public void cleanUp() {
-        ValidatableResponse loginResponse = userApi.loginUser(newUser.getEmail(), newUser.getPassword());
+        ValidatableResponse loginResponse = userApi.loginUser(login);
 
         if (loginResponse.extract().statusCode() == SC_OK) {
             String accessToken = loginResponse.extract().path("accessToken");
@@ -90,7 +94,7 @@ public class CreateUserTest {
     @Description("Проверка на то, что нельзя создать пользователя без поля name")
     @DisplayName("Создать пользователя без имени")
     public void createUserWithoutNameTest() {
-        newUser.setPassword(null);
+        newUser.setName(null);
 
         ValidatableResponse response = userApi.createUser(newUser);
         response

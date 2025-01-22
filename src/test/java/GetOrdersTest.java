@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.praktikum.api.OrderApi;
 import ru.yandex.praktikum.api.UserApi;
+import ru.yandex.praktikum.data.CreateUser;
+import ru.yandex.praktikum.data.LoginUser;
 import ru.yandex.praktikum.data.OrderData;
 import ru.yandex.praktikum.data.UserData;
 import java.util.List;
@@ -18,17 +20,20 @@ public class GetOrdersTest {
     private UserApi userApi;
     private OrderData newOrder;
     private OrderApi orderApi;
+    private LoginUser login;
     String accessToken;
     private List<String> ingredientsHash;
 
     @Before
     public void setUp() {
         userApi = new UserApi();
-        newUser = new UserData();
         orderApi = new OrderApi();
         newOrder = new OrderData();
+        newUser = CreateUser.createRandomUser();
+        login = new LoginUser(newUser.getEmail(), newUser.getPassword());
 
-        ValidatableResponse response = userApi.createUser(newUser);
+        userApi.createUser(newUser);
+        ValidatableResponse response = userApi.loginUser(login);
         accessToken = response.extract().body().path("accessToken");
 
         ValidatableResponse ingredientsResponse = orderApi.getAllIngredients();

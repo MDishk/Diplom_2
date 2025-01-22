@@ -2,6 +2,7 @@ package ru.yandex.praktikum.api;
 
 import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
+import ru.yandex.praktikum.data.LoginUser;
 import ru.yandex.praktikum.data.UserData;
 import static io.restassured.RestAssured.given;
 
@@ -22,11 +23,10 @@ public class UserApi extends RestApi {
     }
 
     @Step("POST-запрос на авторизацию пользователя")
-    public ValidatableResponse loginUser(String email, String password) {
-        String loginBody = String.format("{\"email\": \"%s\", \"password\": \"%s\"}", email, password);
+    public ValidatableResponse loginUser(LoginUser login) {
         return given()
                 .spec(requestSpecification())
-                .and().body(loginBody)
+                .and().body(login)
                 .when().post(LOGIN_USER)
                 .then();
     }
@@ -42,12 +42,11 @@ public class UserApi extends RestApi {
     }
 
     @Step("PATCH-запрос на изменение информации о пользователе")
-    public ValidatableResponse changeUserInfo(String accessToken, String email, String name) {
-        String loginBody = String.format("{\"email\": \"%s\", \"name\": \"%s\"}", email, name);
+    public ValidatableResponse changeUserInfo(String accessToken, UserData userData) {
         return given()
                 .spec(requestSpecification())
                 .header("Authorization", accessToken)
-                .and().body(loginBody)
+                .and().body(userData)
                 .when().patch(CHANGE_USER_INFO)
                 .then();
     }

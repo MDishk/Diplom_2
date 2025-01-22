@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.praktikum.api.OrderApi;
 import ru.yandex.praktikum.api.UserApi;
+import ru.yandex.praktikum.data.CreateUser;
 import ru.yandex.praktikum.data.OrderData;
 import ru.yandex.praktikum.data.UserData;
 import java.util.List;
@@ -24,7 +25,7 @@ public class CreateOrderTest {
     @Before
     public void setUp() {
         userApi = new UserApi();
-        newUser = new UserData();
+        newUser = CreateUser.createRandomUser();
         orderApi = new OrderApi();
         newOrder = new OrderData();
 

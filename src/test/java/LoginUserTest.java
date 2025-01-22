@@ -6,6 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.praktikum.api.UserApi;
+import ru.yandex.praktikum.data.CreateUser;
+import ru.yandex.praktikum.data.LoginUser;
 import ru.yandex.praktikum.data.UserData;
 import static org.hamcrest.Matchers.is;
 
@@ -13,15 +15,17 @@ public class LoginUserTest {
 
     private UserData newUser;
     private UserApi userApi;
+    private LoginUser login;
     String accessToken;
 
     @Before
     public void setUp() {
         userApi = new UserApi();
-        newUser = new UserData();
+        newUser = CreateUser.createRandomUser();
+        login = new LoginUser(newUser.getEmail(), newUser.getPassword());
 
         userApi.createUser(newUser);
-        ValidatableResponse loginResponse = userApi.loginUser(newUser.getEmail(), newUser.getPassword());
+        ValidatableResponse loginResponse = userApi.loginUser(login);
         accessToken = loginResponse.extract().body().path("accessToken");
     }
 
@@ -34,7 +38,7 @@ public class LoginUserTest {
     @Description("Проверка на то, что существующий пользователь может авторизоваться")
     @DisplayName("Авторизация пользователя")
     public void loginUserTest() {
-        ValidatableResponse loginResponse = userApi.loginUser(newUser.getEmail(), newUser.getPassword());
+        ValidatableResponse loginResponse = userApi.loginUser(login);
         loginResponse
                 .log().all()
                 .assertThat()
@@ -46,8 +50,8 @@ public class LoginUserTest {
     @Description("Проверка на то, что пользователь не сможет авторизоваться без поля email")
     @DisplayName("Авторизация пользователя без почты")
     public void loginUserWithoutEmailTest() {
-        newUser.setEmail(null);
-        ValidatableResponse loginResponse = userApi.loginUser(newUser.getEmail(), newUser.getPassword());
+        login = new LoginUser(null, newUser.getPassword());
+        ValidatableResponse loginResponse = userApi.loginUser(login);
         loginResponse
                 .log().all()
                 .assertThat()
@@ -59,8 +63,8 @@ public class LoginUserTest {
     @Description("Проверка на то, что пользователь не сможет авторизоваться без поля password")
     @DisplayName("Авторизация пользователя без пароля")
     public void loginUserWithoutPasswordTest() {
-        newUser.setPassword(null);
-        ValidatableResponse loginResponse = userApi.loginUser(newUser.getEmail(), newUser.getPassword());
+        login = new LoginUser(newUser.getEmail(), null);
+        ValidatableResponse loginResponse = userApi.loginUser(login);
         loginResponse
                 .log().all()
                 .assertThat()
